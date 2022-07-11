@@ -1,0 +1,19 @@
+{
+  "files.exclude": {
+    ".direnv": true,
+    "result": true
+  },
+  "rust-analyzer.procMacro.attributes.enable": true,
+  "cSpell.words": [
+    "milli",
+    "quickcheck",
+    "reqwest",
+    "splitwise",
+    "timesheet",
+    "usecases",
+    "YNAB"
+  ],
+  "lldb.verboseLogging": true,
+  "lldb.launch.terminal": "integrated",
+  "lldb.library": ""
+}
