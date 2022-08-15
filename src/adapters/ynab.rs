@@ -1,5 +1,6 @@
 use anyhow::{bail, Result};
-use reqwest::{blocking::Client, StatusCode};
+use async_trait::async_trait;
+use reqwest::{Client, StatusCode};
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -28,8 +29,13 @@ impl YNAB {
     }
 }
 
+#[async_trait]
 impl Budget for YNAB {
-    fn create_transactions(&self, transactions: Vec<Transaction>) -> Result<()> {
+    async fn create_transactions(&self, transactions: Vec<Transaction>) -> Result<()> {
+        if transactions.len() == 0 {
+            return Ok(());
+        }
+
         let response = self
             .client
             .post(format!(
@@ -38,13 +44,18 @@ impl Budget for YNAB {
             ))
             .bearer_auth(&self.bearer_token)
             .json(&Transactions { transactions })
-            .send()?;
+            .send()
+            .await?;
 
         if response.status() != StatusCode::CREATED {
-            bail!("YNAB returned {}: {}", response.status(), response.text()?);
+            bail!(
+                "YNAB returned {}: {}",
+                response.status(),
+                response.text().await?
+            );
         }
 
-        println!("{:?}", response.text());
+        println!("{:?}", response.text().await?);
         Ok(())
     }
 }

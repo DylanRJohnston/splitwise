@@ -1,7 +1,8 @@
 use crate::{models::Expenses, ports::expense_tracker::ExpenseTracker};
 
 use anyhow::Result;
-use reqwest::blocking::Client;
+use async_trait::async_trait;
+use reqwest::Client;
 
 struct Splitwise {
     client: Client,
@@ -17,13 +18,16 @@ pub fn new(bearer_token: String) -> impl ExpenseTracker {
 
 const EXPENSES_URL: &str = "https://secure.splitwise.com/api/v3.0/get_expenses";
 
+#[async_trait]
 impl ExpenseTracker for Splitwise {
-    fn get_all_expenses(&self) -> Result<Expenses> {
+    async fn get_all_expenses(&self) -> Result<Expenses> {
         self.client
             .get(EXPENSES_URL)
             .bearer_auth(&self.bearer_token)
-            .send()?
+            .send()
+            .await?
             .json::<Expenses>()
+            .await
             .map_err(Into::into)
     }
 }

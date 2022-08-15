@@ -8,9 +8,10 @@
       url = "github:nix-community/fenix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nix-filter.url = "github:numtide/nix-filter";
   };
 
-  outputs = { self, nixpkgs, flake-utils, naersk, fenix }: flake-utils.lib.eachDefaultSystem (system:
+  outputs = { self, nixpkgs, flake-utils, nix-filter, naersk, fenix }: flake-utils.lib.eachDefaultSystem (system:
     let
       pkgs = nixpkgs.legacyPackages.${system};
       fenix-lib = fenix.packages.${system}.complete;
@@ -19,18 +20,24 @@
     in
     {
       devShell = pkgs.mkShell {
-        buildInputs = with fenix-lib;
+        buildInputs =
           [
-            cargo
-            rustc
-            rustfmt
-            clippy
+            fenix-lib.toolchain
             pkgs.libiconv
             pkgs.sqlite
-            pkgs.lldb
           ] ++ darwin-support;
 
         RUST_SRC_PATH = "${fenix-lib.rust-src}/lib/rustlib/src/rust/library";
+      };
+      defaultPackage = naersk-lib.buildPackage {
+        src = nix-filter.lib {
+          root = ./.;
+          include = [
+            "Cargo.lock"
+            "Cargo.toml"
+            (nix-filter.lib.inDirectory "src")
+          ];
+        };
       };
     });
 }

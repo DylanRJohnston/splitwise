@@ -1,24 +1,30 @@
-#![feature(let_chains, type_alias_impl_trait)]
+#![feature(
+    let_chains,
+    type_alias_impl_trait,
+    generic_associated_types,
+    async_closure
+)]
 
 mod adapters;
 mod models;
 mod ports;
 mod usecases;
 
-use adapters::{splitwise, sqlite::SQLite, ynab};
+use adapters::{dynamodb::DynamoDB, splitwise, ynab};
 use anyhow::Result;
 
 use models::{transformer::Config, YNABAccount};
 use ports::secrets::Secrets;
 use usecases::processor::process;
 
-fn main() -> Result<()> {
+#[tokio::main]
+async fn main() -> Result<()> {
     let secrets = adapters::env::Env;
 
     let expense_tracker = splitwise::new(secrets.get("SPLITWISE_API_KEY")?);
     let budget = ynab::YNAB::new(secrets.get("YNAB_BUDGET_ID")?, secrets.get("YNAB_API_KEY")?);
 
-    let state = SQLite::new("main.db")?;
+    let state = DynamoDB::new("main.db".to_owned());
 
     let config = Config {
         splitwise_account: YNABAccount {
@@ -34,5 +40,5 @@ fn main() -> Result<()> {
         splitwise_user_id: secrets.get("SPLITWISE_USER_ID")?,
     };
 
-    process(config, expense_tracker, budget, state)
+    process(config, expense_tracker, budget, state).await
 }

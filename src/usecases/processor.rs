@@ -1,33 +1,35 @@
 use anyhow::{Ok, Result};
 
 use crate::{
-    models::transformer,
+    models::{transformer, Record},
     ports::{budget::Budget, expense_tracker::ExpenseTracker, store::Set},
 };
 
-pub fn process(
+pub async fn process(
     config: transformer::Config,
     expense_tracker: impl ExpenseTracker,
     budget: impl Budget,
-    state: impl Set,
+    records: impl Set<Record>,
 ) -> Result<()> {
     let to_transaction = transformer::new(config);
 
-    let new_expenses = expense_tracker
-        .get_all_expenses()?
-        .expenses
+    let all_expenses = expense_tracker.get_all_expenses().await?.expenses;
+    let old_expenses = records
+        .batch_has(&all_expenses.iter().map(Into::into).collect::<Vec<_>>())
+        .await?;
+
+    let new_expenses = all_expenses
         .into_iter()
-        .try_fold(vec![], |mut acc, it| {
-            if !state.has(it.id)? {
-                acc.push(it);
-            }
-            Ok(acc)
-        })?;
+        .filter(|it| !old_expenses.contains_key(&it.id))
+        .collect::<Vec<_>>();
 
-    let expense_ids = new_expenses.iter().map(|it| it.id).collect::<Vec<i64>>();
+    budget
+        .create_transactions(to_transaction(&new_expenses))
+        .await?;
 
-    budget.create_transactions(to_transaction(&new_expenses))?;
-    state.batch_add(expense_ids)?;
+    records
+        .batch_add(&new_expenses.iter().map(Into::into).collect::<Vec<_>>())
+        .await?;
 
     Ok(())
 }

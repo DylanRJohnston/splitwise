@@ -1,0 +1,23 @@
+name: CD
+on: [push]
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v17
+
+      - name: Cachix
+        uses: cachix/cachix-action@v10
+        with:
+          name: splitwise
+          authToken: ${{ secrets.CACHIX_KEY }}
+
+      - name: Build
+        run: nix build -L
+
+      - name: Cache
+        run: nix-store -qR --include-outputs $(nix eval --raw .#defaultPackage.drvPath) | cachix push splitwise
