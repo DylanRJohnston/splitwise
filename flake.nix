@@ -25,6 +25,8 @@
             fenix-lib.toolchain
             pkgs.libiconv
             pkgs.sqlite
+            pkgs.terraform
+            pkgs.awscli2
           ] ++ darwin-support;
 
         RUST_SRC_PATH = "${fenix-lib.rust-src}/lib/rustlib/src/rust/library";

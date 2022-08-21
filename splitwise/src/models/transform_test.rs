@@ -1,6 +1,6 @@
 use anyhow::Result;
+use own::own;
 use pretty_assertions::assert_eq;
-use splitwise::own;
 use std::{fs, path::Path};
 use transformer::YNABAccount;
 
@@ -17,14 +17,12 @@ fn load_test_data() -> Result<Vec<Expense>> {
 
 fn new_transformer() -> Transformer {
     transformer::new(own!(transformer::Config {
-        splitwise_account: YNABAccount {
-            id: "splitwise-account-id",
-            name: "splitwise",
+        splitwise: YNABAccount {
+            account_id: "splitwise-account-id",
             transfer_id: "splitwise-transfer-id",
         },
-        expenses_account: YNABAccount {
-            id: "expenses-account-id",
-            name: "expenses account",
+        expenses: YNABAccount {
+            account_id: "expenses-account-id",
             transfer_id: "expenses-account-transfer-id",
         },
         splitwise_user_id: 2,
@@ -44,7 +42,7 @@ pub fn test_direct_expense() -> Result<()> {
         own!(Transaction {
             account_id: "expenses-account-id",
             date: expenses[0].date,
-            amount: -83250,
+            amount: (-83250),
             payee_id: None,
             payee_name: None,
             memo: "Groceries",
@@ -83,7 +81,7 @@ pub fn test_indirect_expense() -> Result<()> {
         own!(Transaction {
             account_id: "splitwise-account-id",
             date: expenses[0].date,
-            amount: -121820,
+            amount: (-121820),
             payee_id: None,
             payee_name: Some("Bar Bar"),
             memo: "Gas",
@@ -99,7 +97,7 @@ pub fn test_indirect_expense() -> Result<()> {
 pub fn test_payment_to_you() -> Result<()> {
     let expenses = &load_test_data()?[1..2];
 
-    let transactions = new_transformer()(&expenses);
+    let transactions = new_transformer()(expenses);
 
     assert_eq!(transactions.len(), 1);
 
@@ -108,7 +106,7 @@ pub fn test_payment_to_you() -> Result<()> {
         own!(Transaction {
             account_id: "splitwise-account-id",
             date: expenses[0].date,
-            amount: -87870,
+            amount: (-87870),
             payee_id: Some("expenses-account-transfer-id"),
             payee_name: None,
             memo: "Bar Bar settling up",
@@ -133,7 +131,7 @@ pub fn payment_from_you() -> Result<()> {
         own!(Transaction {
             account_id: "expenses-account-id",
             date: expenses[0].date,
-            amount: -81690,
+            amount: (-81690),
             payee_id: Some("splitwise-transfer-id"),
             payee_name: None,
             memo: "Foo Foo settling up",

@@ -1,29 +1,29 @@
 use super::{Cents, Expense, Share, Transaction};
-use splitwise::own;
+use own::own;
 
 #[derive(Debug)]
 pub struct YNABAccount {
-    pub id: String,
-    pub name: String,
+    pub account_id: String,
     pub transfer_id: String,
 }
 
 #[derive(Debug)]
 pub struct Config {
-    pub splitwise_account: YNABAccount,
-    pub expenses_account: YNABAccount,
+    pub splitwise: YNABAccount,
+    pub expenses: YNABAccount,
     pub splitwise_user_id: i64,
 }
 
+#[allow(clippy::redundant_clone)]
 fn payment(account_id: &str, transfer_id: &str, expense: &Expense) -> Vec<Transaction> {
     vec![own!(Transaction {
         account_id: account_id,
         date: expense.date,
-        amount: -1 * expense.cost.milli_dollars(),
+        amount: -expense.cost.milli_dollars(),
         payee_id: Some(transfer_id),
         payee_name: None,
         memo: format!("{} settling up", expense.created_by.full_name()),
-        cleared: format!("cleared"),
+        cleared: "cleared",
         approved: false,
     })]
 }
@@ -48,7 +48,7 @@ fn shared_expense(
         transactions.push(own!(Transaction {
             account_id: expenses_account_id,
             date: expense.date,
-            amount: -1 * your_share.paid_share.milli_dollars(),
+            amount: -your_share.paid_share.milli_dollars(),
             payee_id: None,
             payee_name: None,
             memo: expense.description,
@@ -61,7 +61,7 @@ fn shared_expense(
         transactions.push(own!(Transaction {
             account_id: splitwise_account_id,
             date: expense.date,
-            amount: -1 * share.net_balance.milli_dollars(),
+            amount: -share.net_balance.milli_dollars(),
             payee_id: None,
             payee_name: Some(share.user.full_name()),
             memo: expense.description,
@@ -73,35 +73,45 @@ fn shared_expense(
     transactions
 }
 
+enum Kind {
+    SharedExpense,
+    SettleUp,
+    Payment,
+}
+
+fn classify(config: &Config, expense: &Expense) -> Kind {
+    if !expense.payment {
+        Kind::SharedExpense
+    } else if expense.created_by.id == config.splitwise_user_id {
+        Kind::SettleUp
+    } else {
+        Kind::Payment
+    }
+}
+
 pub type Transformer = impl Fn(&[Expense]) -> Vec<Transaction>;
 
 pub fn new(config: Config) -> Transformer {
-    move |expenses| {
+    move |expenses: &[Expense]| {
         expenses
-            .into_iter()
-            .flat_map(|expense| {
-                if !expense.payment {
-                    return shared_expense(
-                        config.splitwise_user_id,
-                        &config.expenses_account.id,
-                        &config.splitwise_account.id,
-                        expense,
-                    );
-                }
-
-                if expense.created_by.id == config.splitwise_user_id {
-                    return payment(
-                        &config.expenses_account.id,
-                        &config.splitwise_account.transfer_id,
-                        expense,
-                    );
-                }
-
-                return payment(
-                    &config.splitwise_account.id,
-                    &config.expenses_account.transfer_id,
+            .iter()
+            .flat_map(|expense| match classify(&config, expense) {
+                Kind::SharedExpense => shared_expense(
+                    config.splitwise_user_id,
+                    &config.expenses.account_id,
+                    &config.splitwise.account_id,
                     expense,
-                );
+                ),
+                Kind::SettleUp => payment(
+                    &config.expenses.account_id,
+                    &config.splitwise.transfer_id,
+                    expense,
+                ),
+                Kind::Payment => payment(
+                    &config.splitwise.account_id,
+                    &config.expenses.transfer_id,
+                    expense,
+                ),
             })
             .collect()
     }

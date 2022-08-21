@@ -20,7 +20,7 @@ pub async fn process(
 
     let new_expenses = all_expenses
         .into_iter()
-        .filter(|it| !old_expenses.contains_key(&it.id))
+        .filter(|it| !old_expenses.contains_key(&it.id.to_string()))
         .collect::<Vec<_>>();
 
     budget

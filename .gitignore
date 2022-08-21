@@ -3,3 +3,4 @@ target
 secrets.sh
 main.db
 .env
+.terraform

@@ -8,7 +8,7 @@ use crate::models::ID;
 #[async_trait]
 pub trait Set<A: ID> {
     async fn has(&self, key: A) -> Result<bool>;
-    async fn batch_has(&self, key: &[A]) -> Result<HashMap<A::ID, A>>;
+    async fn batch_has(&self, key: &[A]) -> Result<HashMap<String, A>>;
     async fn add(&self, key: A) -> Result<()>;
     async fn batch_add(&self, key: &[A]) -> Result<()>;
 }

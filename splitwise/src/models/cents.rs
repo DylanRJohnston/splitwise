@@ -10,7 +10,7 @@ pub struct Cents(pub i64);
 
 impl Cents {
     pub fn milli_dollars(&self) -> i64 {
-        return self.0 * 10;
+        self.0 * 10
     }
 }
 
@@ -45,12 +45,12 @@ impl<'de> Deserialize<'de> for Cents {
             where
                 E: Error,
             {
-                let parts: Vec<&str> = value.split(".").collect();
+                let parts: Vec<&str> = value.split('.').collect();
 
                 let dollars = parts[0].parse::<i64>().map_err(E::custom)?;
                 let cents = parts[1].parse::<i64>().map_err(E::custom)?;
 
-                return Ok(Cents(dollars * 100 + dollars.signum() * cents));
+                Ok(Cents(dollars * 100 + dollars.signum() * cents))
             }
         }
 

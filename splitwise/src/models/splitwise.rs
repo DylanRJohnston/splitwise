@@ -1,4 +1,4 @@
-use super::Cents;
+use super::{Cents, ID};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -43,6 +43,12 @@ pub struct Expense {
     pub created_by: User,
     pub updated_at: String,
     pub users: Vec<Share>,
+}
+
+impl ID for Expense {
+    fn id(&self) -> String {
+        self.id.to_string()
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]

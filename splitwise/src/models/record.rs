@@ -8,10 +8,8 @@ pub struct Record {
 }
 
 impl ID for Record {
-    type ID = i64;
-
-    fn id(&self) -> Self::ID {
-        self.id
+    fn id(&self) -> String {
+        self.id.to_string()
     }
 }
 

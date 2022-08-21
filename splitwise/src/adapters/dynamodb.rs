@@ -2,11 +2,12 @@ use std::collections::HashMap;
 
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
+use aws_config::meta::region::RegionProviderChain;
 use aws_sdk_dynamodb::{
-    model::{KeysAndAttributes, PutRequest, WriteRequest},
+    model::{AttributeValue, KeysAndAttributes, PutRequest, WriteRequest},
     Client,
 };
-use aws_types::sdk_config::SdkConfig;
+
 use serde::{de::DeserializeOwned, Serialize};
 
 use crate::{models::ID, ports::store::Set};
@@ -16,9 +17,14 @@ pub struct DynamoDB {
     table_name: String,
 }
 
+pub trait Storable = Serialize + DeserializeOwned + ID + Send + Sync + 'static;
+
 impl DynamoDB {
-    pub fn new(table_name: String) -> DynamoDB {
-        let config = SdkConfig::builder().build();
+    #[allow(clippy::new_ret_no_self)]
+    pub async fn new<A: Storable>(table_name: String) -> impl Set<A> {
+        let region_provider = RegionProviderChain::default_provider().or_else("ap-southeast-2");
+        let config = aws_config::from_env().region(region_provider).load().await;
+
         let client = Client::new(&config);
 
         DynamoDB { client, table_name }
@@ -26,7 +32,7 @@ impl DynamoDB {
 }
 
 #[async_trait]
-impl<A: Serialize + DeserializeOwned + ID + Send + Sync + 'static> Set<A> for DynamoDB {
+impl<A: Storable> Set<A> for DynamoDB {
     async fn has(&self, key: A) -> Result<bool> {
         let id = key.id();
 
@@ -37,21 +43,25 @@ impl<A: Serialize + DeserializeOwned + ID + Send + Sync + 'static> Set<A> for Dy
         self.batch_add(&[key]).await
     }
 
-    async fn batch_has(&self, key: &[A]) -> Result<HashMap<A::ID, A>> {
-        let keys_and_attributes = KeysAndAttributes::builder().build();
+    async fn batch_has(&self, keys: &[A]) -> Result<HashMap<String, A>> {
+        let keys_and_attributes = keys
+            .iter()
+            .map(|it| HashMap::from([("id".to_owned(), AttributeValue::S(it.id()))]))
+            .fold(KeysAndAttributes::builder(), |it, key| it.keys(key))
+            .build();
 
         let mut response = self
             .client
             .batch_get_item()
-            .request_items(self.table_name.to_owned(), keys_and_attributes)
+            .request_items(self.table_name.clone(), keys_and_attributes)
             .send()
             .await?
             .responses
-            .ok_or(anyhow!("no response"))?;
+            .ok_or_else(|| anyhow!("no response"))?;
 
         let data = response
             .remove(&self.table_name)
-            .ok_or(anyhow!("no data for table {}", self.table_name))
+            .ok_or_else(|| anyhow!("no data for table {}", self.table_name))
             .and_then(|it| Ok(serde_dynamo::from_items::<_, A>(it)?))?;
 
         Ok(data.into_iter().map(|it| (it.id(), it)).collect())
@@ -73,6 +83,8 @@ impl<A: Serialize + DeserializeOwned + ID + Send + Sync + 'static> Set<A> for Dy
             .iter()
             .map(to_write_request)
             .collect::<Result<Vec<_>>>()?;
+
+        println!("Write Request\n\n{:?}\n\n", items);
 
         self.client
             .batch_write_item()
