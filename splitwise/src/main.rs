@@ -25,7 +25,7 @@ async fn main() -> Result<()> {
     let expense_tracker = splitwise::new(secrets.get("SPLITWISE_API_KEY")?);
     let budget = ynab::Ynab::new(secrets.get("YNAB_BUDGET_ID")?, secrets.get("YNAB_API_KEY")?);
 
-    let state = DynamoDB::new("main.db".to_owned()).await;
+    let state = DynamoDB::new("splitwise".to_owned()).await;
 
     let config = Config {
         splitwise: YNABAccount {

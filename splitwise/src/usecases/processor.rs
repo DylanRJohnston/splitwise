@@ -1,26 +1,25 @@
 use anyhow::{Ok, Result};
 
 use crate::{
-    models::{transformer, Record},
-    ports::{budget::Budget, expense_tracker::ExpenseTracker, store::Set},
+    models::{transformer, Record, ID},
+    ports::{budget::Budget, expense_tracker::ExpenseTracker, store::Store},
 };
 
 pub async fn process(
     config: transformer::Config,
     expense_tracker: impl ExpenseTracker,
     budget: impl Budget,
-    records: impl Set<Record>,
+    records: impl Store,
 ) -> Result<()> {
     let to_transaction = transformer::new(config);
 
     let all_expenses = expense_tracker.get_all_expenses().await?.expenses;
-    let old_expenses = records
-        .batch_has(&all_expenses.iter().map(Into::into).collect::<Vec<_>>())
-        .await?;
+    let expense_ids = all_expenses.iter().map(ID::id).collect::<Vec<_>>();
+    let already_processed = records.batch_has(expense_ids).await?;
 
     let new_expenses = all_expenses
         .into_iter()
-        .filter(|it| !old_expenses.contains_key(&it.id.to_string()))
+        .filter(|it| !already_processed.contains(&it.id()))
         .collect::<Vec<_>>();
 
     budget
@@ -28,7 +27,7 @@ pub async fn process(
         .await?;
 
     records
-        .batch_add(&new_expenses.iter().map(Into::into).collect::<Vec<_>>())
+        .batch_add(new_expenses.iter().map(Into::<Record>::into).collect())
         .await?;
 
     Ok(())

@@ -1,14 +1,17 @@
-use std::collections::HashMap;
+use std::collections::HashSet;
 
 use anyhow::Result;
 use async_trait::async_trait;
+use serde::{de::DeserializeOwned, Serialize};
 
 use crate::models::ID;
 
+pub trait Storable = Serialize + DeserializeOwned + ID + Send + Sync + 'static;
+
 #[async_trait]
-pub trait Set<A: ID> {
-    async fn has(&self, key: A) -> Result<bool>;
-    async fn batch_has(&self, key: &[A]) -> Result<HashMap<String, A>>;
-    async fn add(&self, key: A) -> Result<()>;
-    async fn batch_add(&self, key: &[A]) -> Result<()>;
+pub trait Store {
+    async fn has(&self, id: String) -> Result<bool>;
+    async fn batch_has(&self, ids: Vec<String>) -> Result<HashSet<String>>;
+    async fn add<A: Storable>(&self, item: A) -> Result<()>;
+    async fn batch_add<A: Storable>(&self, items: Vec<A>) -> Result<()>;
 }

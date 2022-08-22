@@ -55,7 +55,6 @@ impl Budget for Ynab {
             );
         }
 
-        println!("{:?}", response.text().await?);
         Ok(())
     }
 }

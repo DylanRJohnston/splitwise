@@ -83,8 +83,6 @@ impl<A> Set<A> for SQLite {
         }
         statement += "(?);";
 
-        println!("{}", statement);
-
         let connection = self.connection.lock().await;
         let mut cursor = connection.prepare(statement)?.into_cursor();
 
@@ -92,8 +90,6 @@ impl<A> Set<A> for SQLite {
             .into_iter()
             .map(|key| Value::Integer(*key))
             .collect::<Vec<Value>>();
-
-        println!("{:?}", bindings);
 
         cursor.bind(&bindings)?;
         cursor.next()?;

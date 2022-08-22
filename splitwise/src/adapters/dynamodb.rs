@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
@@ -8,20 +8,18 @@ use aws_sdk_dynamodb::{
     Client,
 };
 
-use serde::{de::DeserializeOwned, Serialize};
+use serde::{Deserialize, Serialize};
 
-use crate::{models::ID, ports::store::Set};
+use crate::ports::store::{Storable, Store};
 
 pub struct DynamoDB {
     client: Client,
     table_name: String,
 }
 
-pub trait Storable = Serialize + DeserializeOwned + ID + Send + Sync + 'static;
-
 impl DynamoDB {
     #[allow(clippy::new_ret_no_self)]
-    pub async fn new<A: Storable>(table_name: String) -> impl Set<A> {
+    pub async fn new(table_name: String) -> DynamoDB {
         let region_provider = RegionProviderChain::default_provider().or_else("ap-southeast-2");
         let config = aws_config::from_env().region(region_provider).load().await;
 
@@ -31,22 +29,29 @@ impl DynamoDB {
     }
 }
 
+#[derive(Serialize, Deserialize)]
+struct Id {
+    id: String,
+}
+
 #[async_trait]
-impl<A: Storable> Set<A> for DynamoDB {
-    async fn has(&self, key: A) -> Result<bool> {
-        let id = key.id();
-
-        Ok(self.batch_has(&[key]).await?.contains_key(&id))
+impl Store for DynamoDB {
+    async fn has(&self, id: String) -> Result<bool> {
+        Ok(self.batch_has(vec![id.clone()]).await?.contains(&id))
     }
 
-    async fn add(&self, key: A) -> Result<()> {
-        self.batch_add(&[key]).await
+    async fn add<A: Storable>(&self, item: A) -> Result<()> {
+        self.batch_add(vec![item]).await
     }
 
-    async fn batch_has(&self, keys: &[A]) -> Result<HashMap<String, A>> {
-        let keys_and_attributes = keys
-            .iter()
-            .map(|it| HashMap::from([("id".to_owned(), AttributeValue::S(it.id()))]))
+    async fn batch_has(&self, ids: Vec<String>) -> Result<HashSet<String>> {
+        if ids.is_empty() {
+            return Ok(HashSet::new());
+        }
+
+        let keys_and_attributes = ids
+            .into_iter()
+            .map(|it| HashMap::from([("id".to_owned(), AttributeValue::S(it))]))
             .fold(KeysAndAttributes::builder(), |it, key| it.keys(key))
             .build();
 
@@ -62,12 +67,16 @@ impl<A: Storable> Set<A> for DynamoDB {
         let data = response
             .remove(&self.table_name)
             .ok_or_else(|| anyhow!("no data for table {}", self.table_name))
-            .and_then(|it| Ok(serde_dynamo::from_items::<_, A>(it)?))?;
+            .and_then(|it| Ok(serde_dynamo::from_items::<_, Id>(it)?))?;
 
-        Ok(data.into_iter().map(|it| (it.id(), it)).collect())
+        Ok(data.into_iter().map(|it| it.id).collect())
     }
 
-    async fn batch_add(&self, key: &[A]) -> Result<()> {
+    async fn batch_add<A: Storable>(&self, items: Vec<A>) -> Result<()> {
+        if items.is_empty() {
+            return Ok(());
+        }
+
         let to_write_request = |item: &A| -> Result<WriteRequest> {
             let data = serde_dynamo::to_item(item)?;
 
@@ -79,16 +88,14 @@ impl<A: Storable> Set<A> for DynamoDB {
             Ok(write_request)
         };
 
-        let items = key
+        let write_requests = items
             .iter()
             .map(to_write_request)
             .collect::<Result<Vec<_>>>()?;
 
-        println!("Write Request\n\n{:?}\n\n", items);
-
         self.client
             .batch_write_item()
-            .request_items(self.table_name.to_owned(), items)
+            .request_items(self.table_name.to_owned(), write_requests)
             .send()
             .await?;
 

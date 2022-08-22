@@ -1,14 +1,14 @@
 use super::{Cents, ID};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Repayment {
     pub from: i64,
     pub to: i64,
     pub amount: Cents,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct User {
     pub id: i64,
     pub first_name: String,
@@ -21,7 +21,7 @@ impl User {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Share {
     pub user: User,
     pub user_id: i64,

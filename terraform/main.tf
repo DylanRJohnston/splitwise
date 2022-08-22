@@ -41,3 +41,22 @@ module "dynamodb_table_integration_test" {
     Environment = "test"
   }
 }
+
+module "splitwise_dynamodb_table" {
+  source   = "terraform-aws-modules/dynamodb-table/aws"
+
+  name     = "splitwise"
+  hash_key = "id"
+
+  attributes = [
+    {
+      name = "id"
+      type = "S"
+    }
+  ]
+
+  tags = {
+    Terraform   = "true"
+    Environment = "prod"
+  }
+}
