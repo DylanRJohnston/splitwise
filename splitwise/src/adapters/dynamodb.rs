@@ -37,21 +37,21 @@ struct Id {
 #[async_trait]
 impl Store for DynamoDB {
     async fn has(&self, id: String) -> Result<bool> {
-        Ok(self.batch_has(vec![id.clone()]).await?.contains(&id))
+        Ok(self.batch_has(&[id.clone()]).await?.contains(&id))
     }
 
     async fn add<A: Storable>(&self, item: A) -> Result<()> {
-        self.batch_add(vec![item]).await
+        self.batch_add(&[item]).await
     }
 
-    async fn batch_has(&self, ids: Vec<String>) -> Result<HashSet<String>> {
+    async fn batch_has(&self, ids: &[String]) -> Result<HashSet<String>> {
         if ids.is_empty() {
             return Ok(HashSet::new());
         }
 
         let keys_and_attributes = ids
-            .into_iter()
-            .map(|it| HashMap::from([("id".to_owned(), AttributeValue::S(it))]))
+            .iter()
+            .map(|it| HashMap::from([("id".to_owned(), AttributeValue::S(it.to_owned()))]))
             .fold(KeysAndAttributes::builder(), |it, key| it.keys(key))
             .build();
 
@@ -72,7 +72,7 @@ impl Store for DynamoDB {
         Ok(data.into_iter().map(|it| it.id).collect())
     }
 
-    async fn batch_add<A: Storable>(&self, items: Vec<A>) -> Result<()> {
+    async fn batch_add<A: Storable>(&self, items: &[A]) -> Result<()> {
         if items.is_empty() {
             return Ok(());
         }

@@ -15,7 +15,7 @@ pub async fn process(
 
     let all_expenses = expense_tracker.get_all_expenses().await?.expenses;
     let expense_ids = all_expenses.iter().map(ID::id).collect::<Vec<_>>();
-    let already_processed = records.batch_has(expense_ids).await?;
+    let already_processed = records.batch_has(&expense_ids).await?;
 
     let new_expenses = all_expenses
         .into_iter()
@@ -27,7 +27,12 @@ pub async fn process(
         .await?;
 
     records
-        .batch_add(new_expenses.iter().map(Into::<Record>::into).collect())
+        .batch_add(
+            &new_expenses
+                .iter()
+                .map(Into::<Record>::into)
+                .collect::<Vec<_>>(),
+        )
         .await?;
 
     Ok(())

@@ -11,7 +11,7 @@ pub trait Storable = Serialize + DeserializeOwned + ID + Send + Sync + 'static;
 #[async_trait]
 pub trait Store {
     async fn has(&self, id: String) -> Result<bool>;
-    async fn batch_has(&self, ids: Vec<String>) -> Result<HashSet<String>>;
+    async fn batch_has(&self, ids: &[String]) -> Result<HashSet<String>>;
     async fn add<A: Storable>(&self, item: A) -> Result<()>;
-    async fn batch_add<A: Storable>(&self, items: Vec<A>) -> Result<()>;
+    async fn batch_add<A: Storable>(&self, items: &[A]) -> Result<()>;
 }

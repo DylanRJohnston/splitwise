@@ -19,15 +19,15 @@ impl ID for Test {
 async fn dynamodb_test() -> Result<()> {
     let client = DynamoDB::new("splitwise_integration_test".to_owned()).await;
     let data: Vec<Test> = vec![Faker.fake(), Faker.fake(), Faker.fake()];
-    let set = client.as_set();
+    let ids = data.iter().map(ID::id).collect::<Vec<_>>();
 
-    set.batch_add(&data).await?;
+    client.batch_add(&data).await?;
 
-    let result = set.batch_has(&data).await?;
+    let result = client.batch_has(&ids).await?;
 
-    assert!(result.contains_key(&data[0].id()));
-    assert!(result.contains_key(&data[1].id()));
-    assert!(result.contains_key(&data[2].id()));
+    assert!(result.contains(&ids[0]));
+    assert!(result.contains(&ids[1]));
+    assert!(result.contains(&ids[2]));
 
     Ok(())
 }
