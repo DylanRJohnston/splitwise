@@ -22,12 +22,6 @@ jobs:
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
-      - name: Configure AWS credentials 
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          role-to-assume: arn:aws:iam::300654853575:role/github20220828051401590500000002
-          aws-region: ap-southeast-2
-
       - name: Install latest nightly
         uses: actions-rs/toolchain@v1
         with:
@@ -46,6 +40,12 @@ jobs:
 
       - name: Initialise Terraform
         run: terraform -chdir=terraform init
+
+      - name: Configure AWS credentials 
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::300654853575:role/github20220828051401590500000002
+          aws-region: ap-southeast-2
 
       - name: Apply Terraform
         run: terraform -chdir=terraform apply -auto-approve
