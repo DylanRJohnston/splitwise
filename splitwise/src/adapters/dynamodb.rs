@@ -1,17 +1,19 @@
 use std::collections::{HashMap, HashSet};
 
-use anyhow::{anyhow, Result};
 use async_trait::async_trait;
-use aws_config::meta::region::RegionProviderChain;
+use aws_config::SdkConfig;
 use aws_sdk_dynamodb::{
     model::{AttributeValue, KeysAndAttributes, PutRequest, WriteRequest},
     Client,
 };
+use color_eyre::eyre::{ContextCompat, Result, WrapErr};
+use tracing::instrument;
 
 use serde::{Deserialize, Serialize};
 
 use crate::ports::store::{Storable, Store};
 
+#[derive(Debug)]
 pub struct DynamoDB {
     client: Client,
     table_name: String,
@@ -19,13 +21,11 @@ pub struct DynamoDB {
 
 impl DynamoDB {
     #[allow(clippy::new_ret_no_self)]
-    pub async fn new(table_name: String) -> DynamoDB {
-        let region_provider = RegionProviderChain::default_provider().or_else("ap-southeast-2");
-        let config = aws_config::from_env().region(region_provider).load().await;
-
-        let client = Client::new(&config);
-
-        DynamoDB { client, table_name }
+    pub fn new(sdk_config: &SdkConfig, table_name: &str) -> DynamoDB {
+        DynamoDB {
+            client: Client::new(sdk_config),
+            table_name: table_name.to_owned(),
+        }
     }
 }
 
@@ -36,14 +36,17 @@ struct Id {
 
 #[async_trait]
 impl Store for DynamoDB {
+    #[instrument]
     async fn has(&self, id: String) -> Result<bool> {
         Ok(self.batch_has(&[id.clone()]).await?.contains(&id))
     }
 
+    #[instrument]
     async fn add<A: Storable>(&self, item: A) -> Result<()> {
         self.batch_add(&[item]).await
     }
 
+    #[instrument]
     async fn batch_has(&self, ids: &[String]) -> Result<HashSet<String>> {
         if ids.is_empty() {
             return Ok(HashSet::new());
@@ -60,25 +63,30 @@ impl Store for DynamoDB {
             .batch_get_item()
             .request_items(self.table_name.clone(), keys_and_attributes)
             .send()
-            .await?
+            .await
+            .wrap_err("Failed to talk to DynamoDB")?
             .responses
-            .ok_or_else(|| anyhow!("no response"))?;
+            .wrap_err("No responses")?;
 
         let data = response
             .remove(&self.table_name)
-            .ok_or_else(|| anyhow!("no data for table {}", self.table_name))
-            .and_then(|it| Ok(serde_dynamo::from_items::<_, Id>(it)?))?;
+            .wrap_err(format!("No data for table {}", self.table_name))?;
 
-        Ok(data.into_iter().map(|it| it.id).collect())
+        let ids = serde_dynamo::from_items::<_, Id>(data.clone())
+            .wrap_err_with(|| format!("Failed to deserialize {:?}", data))?;
+
+        Ok(ids.into_iter().map(|it| it.id).collect())
     }
 
+    #[instrument]
     async fn batch_add<A: Storable>(&self, items: &[A]) -> Result<()> {
         if items.is_empty() {
             return Ok(());
         }
 
         let to_write_request = |item: &A| -> Result<WriteRequest> {
-            let data = serde_dynamo::to_item(item)?;
+            let data = serde_dynamo::to_item(item)
+                .wrap_err_with(|| format!("Failed to serialize {:?}", item))?;
 
             let put_request = PutRequest::builder().set_item(Some(data)).build();
             let write_request = WriteRequest::builder()
@@ -97,7 +105,8 @@ impl Store for DynamoDB {
             .batch_write_item()
             .request_items(self.table_name.to_owned(), write_requests)
             .send()
-            .await?;
+            .await
+            .wrap_err("Failed to send items to DynamoDB")?;
 
         Ok(())
     }

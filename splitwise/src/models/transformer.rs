@@ -1,13 +1,13 @@
 use super::{Cents, Expense, Share, Transaction};
 use own::own;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct YNABAccount {
     pub account_id: String,
     pub transfer_id: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Config {
     pub splitwise: YNABAccount,
     pub expenses: YNABAccount,
@@ -79,40 +79,42 @@ enum Kind {
     Payment,
 }
 
-fn classify(config: &Config, expense: &Expense) -> Kind {
+fn classify(user_id: i64, expense: &Expense) -> Kind {
     if !expense.payment {
         Kind::SharedExpense
-    } else if expense.created_by.id == config.splitwise_user_id {
+    } else if expense.created_by.id == user_id {
         Kind::SettleUp
     } else {
         Kind::Payment
     }
 }
 
-pub type Transformer = impl Fn(&[Expense]) -> Vec<Transaction>;
+pub type Transformer<'a> = impl Fn(&[Expense]) -> Vec<Transaction> + 'a;
 
-pub fn new(config: Config) -> Transformer {
+pub fn new(config: &Config) -> Transformer {
     move |expenses: &[Expense]| {
         expenses
             .iter()
-            .flat_map(|expense| match classify(&config, expense) {
-                Kind::SharedExpense => shared_expense(
-                    config.splitwise_user_id,
-                    &config.expenses.account_id,
-                    &config.splitwise.account_id,
-                    expense,
-                ),
-                Kind::SettleUp => payment(
-                    &config.expenses.account_id,
-                    &config.splitwise.transfer_id,
-                    expense,
-                ),
-                Kind::Payment => payment(
-                    &config.splitwise.account_id,
-                    &config.expenses.transfer_id,
-                    expense,
-                ),
-            })
+            .flat_map(
+                |expense| match classify(config.splitwise_user_id, expense) {
+                    Kind::SharedExpense => shared_expense(
+                        config.splitwise_user_id,
+                        &config.expenses.account_id,
+                        &config.splitwise.account_id,
+                        expense,
+                    ),
+                    Kind::SettleUp => payment(
+                        &config.expenses.account_id,
+                        &config.splitwise.transfer_id,
+                        expense,
+                    ),
+                    Kind::Payment => payment(
+                        &config.splitwise.account_id,
+                        &config.expenses.transfer_id,
+                        expense,
+                    ),
+                },
+            )
             .collect()
     }
 }

@@ -1,3 +1,6 @@
 [workspace]
 
 members = ["splitwise", "own"]
+
+[profile.release]
+debug = true

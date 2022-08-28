@@ -1,13 +1,15 @@
-use anyhow::{bail, Result};
 use async_trait::async_trait;
+use color_eyre::eyre::{eyre, Context, Result};
 use reqwest::{Client, StatusCode};
 use serde::{Deserialize, Serialize};
+use tracing::instrument;
 
 use crate::{
     models::{Transaction, Transactions},
     ports::budget::Budget,
 };
 
+#[derive(Debug)]
 pub struct Ynab {
     budget_id: String,
     client: Client,
@@ -31,6 +33,7 @@ impl Ynab {
 
 #[async_trait]
 impl Budget for Ynab {
+    #[instrument]
     async fn create_transactions(&self, transactions: Vec<Transaction>) -> Result<()> {
         if transactions.is_empty() {
             return Ok(());
@@ -43,16 +46,19 @@ impl Budget for Ynab {
                 self.budget_id
             ))
             .bearer_auth(&self.bearer_token)
-            .json(&Transactions { transactions })
+            .json(&Transactions {
+                transactions: transactions.clone(),
+            })
             .send()
-            .await?;
+            .await
+            .wrap_err_with(|| format!("Failed to send transaction to YNAB {:?}", transactions))?;
 
         if response.status() != StatusCode::CREATED {
-            bail!(
+            return Err(eyre!(
                 "YNAB returned {}: {}",
                 response.status(),
                 response.text().await?
-            );
+            ));
         }
 
         Ok(())

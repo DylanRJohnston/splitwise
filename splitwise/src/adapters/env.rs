@@ -1,15 +1,16 @@
-use crate::ports::secrets::Secrets;
-use anyhow::{Context, Result};
-use std::{env, error::Error, str::FromStr};
+use crate::ports::secrets::{Fetchable, Secrets};
+use async_trait::async_trait;
+use color_eyre::{eyre::Context, Result};
+use std::env;
+use tracing::instrument;
 
+#[derive(Debug)]
 pub struct Env;
 
+#[async_trait]
 impl Secrets for Env {
-    fn get<F>(&self, key: &str) -> Result<F>
-    where
-        F: FromStr,
-        <F as FromStr>::Err: Error + Send + Sync + 'static,
-    {
+    #[instrument]
+    async fn get<F: Fetchable>(&self, key: &str) -> Result<F> {
         let raw =
             env::var(key).with_context(|| format!("Failed to fetch {} from environment", key))?;
 

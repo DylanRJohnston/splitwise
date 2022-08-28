@@ -1,5 +1,11 @@
 name: CD
-on: [push]
+on:
+  push:
+    branches:
+      - main
+permissions:
+  id-token: write
+  contents: read
 jobs:
   Build:
     runs-on: ubuntu-latest
@@ -7,17 +13,30 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Install Nix
-        uses: cachix/install-nix-action@v17
-
-      - name: Cachix
-        uses: cachix/cachix-action@v10
+      - name: Configure AWS credentials 
+        uses: aws-actions/configure-aws-credentials@v1
         with:
-          name: splitwise
-          authToken: ${{ secrets.CACHIX_KEY }}
+          role-to-assume: arn:aws:iam::300654853575:role/github20220828051401590500000002
+          aws-region: ap-southeast-2
 
-      - name: Build
-        run: nix build -L
+      - name: Install latest nightly
+        uses: actions-rs/toolchain@v1
+        with:
+            toolchain: nightly
+            override: true
+            components: rustfmt, clippy
+      
+      - name: Install cargo-lambda
+        run: pip3 install cargo-lambda
 
-      - name: Cache
-        run: nix-store -qR --include-outputs $(nix eval --raw .#defaultPackage.drvPath) | cachix push splitwise
+      - name: Build Lambda
+        run: cargo lambda build --release --arm64 --output-format zip
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Initialise Terraform
+        run: terraform -chdir=terraform init
+
+      - name: Apply Terraform
+        run: terraform -chdir=terraform apply -auto-approve

@@ -2,7 +2,7 @@ use super::{Cents, Expense, Repayment, Share, User, ID};
 use own::own;
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Record {
     pub id: String,
     pub group_id: i64,

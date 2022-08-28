@@ -1,4 +1,4 @@
-#![feature(type_alias_impl_trait, let_chains, trait_alias)]
+#![feature(type_alias_impl_trait, trait_alias)]
 
 pub mod adapters;
 pub mod models;

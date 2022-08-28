@@ -1,4 +1,4 @@
-use anyhow::Result;
+use color_eyre::eyre::Result;
 use own::own;
 use pretty_assertions::assert_eq;
 use std::{fs, path::Path};
@@ -15,8 +15,8 @@ fn load_test_data() -> Result<Vec<Expense>> {
     Ok(serde_json::from_str::<Expenses>(&raw)?.expenses)
 }
 
-fn new_transformer() -> Transformer {
-    transformer::new(own!(transformer::Config {
+fn new_transformer() -> Transformer<'static> {
+    let config = Box::new(own!(transformer::Config {
         splitwise: YNABAccount {
             account_id: "splitwise-account-id",
             transfer_id: "splitwise-transfer-id",
@@ -26,7 +26,11 @@ fn new_transformer() -> Transformer {
             transfer_id: "expenses-account-transfer-id",
         },
         splitwise_user_id: 2,
-    }))
+    }));
+
+    // We're in a test so leaking a small amount of data is ok
+    // Alternatively we could use a closure to invert the control and ensure config outlives its consumption
+    transformer::new(Box::leak(config))
 }
 
 #[test]
