@@ -11,7 +11,15 @@
       rustChannel = "nightly";
       packageFun = import ./Cargo.nix;
 
-      pkgs = import nixpkgs { inherit system; overlays = [ cargo2nix.overlays.default ]; };
+      pkgs = import nixpkgs {
+        inherit system;
+        overlays = [ cargo2nix.overlays.default ];
+      };
+      pkgsCross = import nixpkgs {
+        inherit system;
+        pkgsCross.config = "aarch64-unknown-linux-musl";
+        overlays = [ cargo2nix.overlays.default ];
+      };
       rustpkgs = pkgs.rustBuilder.makePackageSet {
         inherit
           rustVersion
@@ -20,7 +28,7 @@
 
         extraRustComponents = [ "clippy" ];
       };
-      rustpkgs-lambda = pkgs.rustBuilder.makePackageSet {
+      rustpkgs-lambda = pkgsCross.rustBuilder.makePackageSet {
         inherit
           rustVersion
           rustChannel
