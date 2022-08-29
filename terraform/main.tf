@@ -71,7 +71,7 @@ module "lambda_function" {
   handler       = "bootstrap"
   description   = "Reconciles Splitwise and YNAB"
   runtime       = "provided.al2"
-  architectures = ["arm64"]
+  architectures = ["x86_64"]
   package_type  = "Zip"
   timeout       = 20
   publish       = true

@@ -5,3 +5,4 @@ main.db
 .env
 .terraform
 result
+result-bin
