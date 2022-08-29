@@ -7,25 +7,26 @@
 
   outputs = { self, nixpkgs, flake-utils, cargo2nix, ... }: flake-utils.lib.eachDefaultSystem (system:
     let
+      rustVersion = "2022-04-09";
+      rustChannel = "nightly";
+      packageFun = import ./Cargo.nix;
+
       pkgs = import nixpkgs { inherit system; overlays = [ cargo2nix.overlays.default ]; };
       rustpkgs = pkgs.rustBuilder.makePackageSet {
-        rustVersion = "2022-04-29";
-        rustChannel = "nightly";
-        packageFun = import ./Cargo.nix;
+        inherit
+          rustVersion
+          rustChannel
+          packageFun;
+
         extraRustComponents = [ "clippy" ];
       };
-
-      target = "x86_64-unknown-linux-musl";
-      pkgs-lambda = import nixpkgs {
-        inherit system;
-        overlays = [ cargo2nix.overlays.default ];
-        crossSystem.config = target;
-      };
       rustpkgs-lambda = pkgs.rustBuilder.makePackageSet {
-        inherit target;
-        rustVersion = "2022-04-29";
-        rustChannel = "nightly";
-        packageFun = import ./Cargo.nix;
+        inherit
+          rustVersion
+          rustChannel
+          packageFun;
+
+        target = "aarch64-unknown-linux-musl";
       };
     in
     rec {
