@@ -1,13 +1,21 @@
 {
   inputs = {
-    cargo2nix.url = "github:cargo2nix/cargo2nix/release-0.11.0";
+    rust-overlay = {
+      url = "github:oxalica/rust-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
+    };
+    cargo2nix = {
+      url = "github:cargo2nix/cargo2nix/release-0.11.0";
+      inputs.rust-overlay.follows = "rust-overlay";
+    };
     flake-utils.follows = "cargo2nix/flake-utils";
     nixpkgs.follows = "cargo2nix/nixpkgs";
   };
 
   outputs = { self, nixpkgs, flake-utils, cargo2nix, ... }: flake-utils.lib.eachDefaultSystem (system:
     let
-      rustVersion = "2022-04-09";
+      rustVersion = "2022-08-29";
       rustChannel = "nightly";
       packageFun = import ./Cargo.nix;
 
