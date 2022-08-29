@@ -26,10 +26,10 @@ jobs:
           authToken: ${{ secrets.CACHIX_KEY }}
 
       - name: Build
-        run:  nix build -L .#lambda
+        run:  nix build -L .#zip
 
       - name: Cache
-        run: nix-store -qR --include-outputs $(nix eval --raw .#lambda.drvPath) | cachix push splitwise
+        run: nix-store -qR --include-outputs $(nix eval --raw .#zip.drvPath) | cachix push splitwise
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
