@@ -49,6 +49,12 @@
               CC = "${cc}/bin/zig-cc";
             };
           })
+          (pkgs.rustBuilder.rustLib.makeOverride {
+            name = "webpki-roots";
+            overrideAttrs = drv: {
+              CC = "${cc}/bin/zig-cc";
+            };
+          })
         ];
 
         target = "aarch64-unknown-linux-musl";
