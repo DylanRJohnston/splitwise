@@ -14,16 +14,30 @@
         packageFun = import ./Cargo.nix;
         extraRustComponents = [ "clippy" ];
       };
+
+      target = "x86_64-unknown-linux-musl";
+      pkgs-lambda = import nixpkgs {
+        inherit system;
+        overlays = [ cargo2nix.overlays.default ];
+        crossSystem.config = target;
+      };
+      rustpkgs-lambda = pkgs.rustBuilder.makePackageSet {
+        inherit target;
+        rustVersion = "2022-04-29";
+        rustChannel = "nightly";
+        packageFun = import ./Cargo.nix;
+      };
     in
     rec {
       devShell = rustpkgs.workspaceShell {
         packages = [ pkgs.terraform ];
       };
       packages = {
-        default = packages.lambda-binary;
+        default = packages.binary;
         binary = (rustpkgs.workspace.splitwise-ynab { }).bin;
+        binary-lambda = (rustpkgs-lambda.workspace.splitwise-ynab { }).bin;
         zip = pkgs.runCommand "lambda" { } ''
-          cp ${packages.binary}/bin/lambda bootstrap
+          cp ${packages.binary-lambda}/bin/lambda bootstrap
           ${pkgs.zip}/bin/zip bootstrap.zip bootstrap
           mv bootstrap.zip $out
         '';
