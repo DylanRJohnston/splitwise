@@ -3,37 +3,33 @@ on:
   push:
     branches:
       - main
+
 permissions:
   id-token: write
   contents: read
+
 jobs:
   Build:
     runs-on: ubuntu-latest
+    environment: production
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+  
+      - name: Install Nix
+        uses: cachix/install-nix-action@v17
 
-      - name: ⚡ Cache
-        uses: actions/cache@v2
+      - name: Cachix
+        uses: cachix/cachix-action@v10
         with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          name: splitwise
+          authToken: ${{ secrets.CACHIX_KEY }}
 
-      - name: Install latest nightly
-        uses: actions-rs/toolchain@v1
-        with:
-            toolchain: nightly
-            override: true
-            components: rustfmt, clippy
-      
-      - name: Install cargo-lambda
-        run: pip3 install cargo-lambda
+      - name: Build
+        run:  nix build -L .#lambda
 
-      - name: Build Lambda
-        run: cargo lambda build --release --arm64 --output-format zip
+      - name: Cache
+        run: nix-store -qR --include-outputs $(nix eval --raw .#lambda.drvPath) | cachix push splitwise
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2

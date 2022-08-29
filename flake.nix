@@ -19,7 +19,7 @@
       lambda-toolchain = with fenix.packages.${system}; combine [
         minimal.cargo
         minimal.rustc
-        targets.aarch64-unknown-linux-musl.latest.rust-std
+        targets.aarch64-unknown-linux-gnu.latest.rust-std
       ];
       rust = naersk.lib.${system}.override {
         cargo = complete-toolchain.cargo;
@@ -60,9 +60,7 @@
           };
         };
         lambda-binary = rust-lambda.buildPackage {
-          CARGO_BUILD_TARGET = "aarch64-unknown-linux-musl";
-          CARGO_BUILD_RUSTFLAGS = "-C target-feature=+crt-static";
-          nativeBuildInputs = [ pkgs.pkgsStatic.stdenv.cc ];
+          CARGO_BUILD_TARGET = "aarch64-unknown-linux-gnu";
           src = nix-filter.lib {
             root = ./.;
             include = [
@@ -74,7 +72,7 @@
           };
         };
         lambda = pkgs.runCommand "lambda" { } ''
-          cp ${packages.binary}/bin/lambda bootstrap
+          cp ${packages.lambda-binary}/bin/lambda bootstrap
           ${pkgs.zip}/bin/zip bootstrap.zip bootstrap
           mv bootstrap.zip $out
         '';

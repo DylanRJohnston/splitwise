@@ -84,7 +84,7 @@ module "lambda_function" {
   }
 
   create_package         = false
-  local_existing_package = "../target/lambda/lambda/bootstrap.zip"
+  local_existing_package = "../result"
 
   attach_policy_statements = true
   policy_statements = {
