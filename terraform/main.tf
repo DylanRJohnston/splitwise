@@ -76,6 +76,8 @@ module "lambda_function" {
   timeout       = 20
   publish       = true
 
+  cloudwatch_logs_retention_in_days = 7
+
   environment_variables = {
     RUST_BACKTRACE          = 1
     AWS_SECRETS_MANAGER_ARN = aws_secretsmanager_secret.splitwise.arn
