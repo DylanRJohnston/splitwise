@@ -25,7 +25,7 @@
       };
       pkgsCross = import nixpkgs {
         inherit system;
-        pkgsCross.config = "aarch64-unknown-linux-musl";
+        crossSystem.config = "aarch64-unknown-linux-musl";
         overlays = [ cargo2nix.overlays.default ];
       };
       rustpkgs = pkgs.rustBuilder.makePackageSet {
