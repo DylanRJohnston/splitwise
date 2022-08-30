@@ -42,21 +42,6 @@
           rustChannel
           packageFun;
 
-        packageOverrides = pkgs: pkgs.rustBuilder.overrides.all ++ [
-          (pkgs.rustBuilder.rustLib.makeOverride {
-            name = "splitwise-ynab";
-            overrideAttrs = drv: {
-              CC = "${cc}/bin/zig-cc";
-            };
-          })
-          (pkgs.rustBuilder.rustLib.makeOverride {
-            name = "webpki-roots";
-            overrideAttrs = drv: {
-              CC = "${cc}/bin/zig-cc";
-            };
-          })
-        ];
-
         target = "aarch64-unknown-linux-musl";
       };
       cc = pkgs.writeShellApplication {
