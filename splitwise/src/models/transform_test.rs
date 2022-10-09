@@ -146,3 +146,28 @@ pub fn payment_from_you() -> Result<()> {
 
     Ok(())
 }
+
+#[test]
+pub fn test_expense_rounding() -> Result<()> {
+    let expenses = &load_test_data()?[4..5];
+
+    let transactions = new_transformer()(expenses);
+
+    assert_eq!(transactions.len(), 1);
+
+    assert_eq!(
+        transactions[0],
+        own!(Transaction {
+            account_id: "splitwise-account-id",
+            date: expenses[0].date,
+            amount: (-5600),
+            payee_id: None,
+            payee_name: Some("Bar Bar"),
+            memo: "Coffee",
+            cleared: "cleared",
+            approved: false,
+        })
+    );
+
+    Ok(())
+}

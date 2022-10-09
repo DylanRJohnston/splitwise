@@ -1,332 +1,415 @@
 {
   "expenses": [
-      {
-          "id": 1,
-          "group_id": 1,
-          "friendship_id": null,
-          "expense_bundle_id": null,
-          "description": "Groceries",
-          "repeats": false,
-          "repeat_interval": null,
-          "email_reminder": false,
-          "email_reminder_in_advance": -1,
-          "next_repeat": null,
-          "details": null,
-          "comments_count": 0,
-          "payment": false,
-          "creation_method": null,
-          "transaction_method": "offline",
-          "transaction_confirmed": false,
-          "transaction_id": null,
-          "transaction_status": null,
-          "cost": "83.25",
-          "currency_code": "AUD",
-          "repayments": [
-              {
-                  "from": 1,
-                  "to": 2,
-                  "amount": "41.63"
-              }
-          ],
-          "date": "2022-06-25T08:05:17Z",
-          "created_at": "2022-06-25T08:05:28Z",
-          "created_by": {
-              "id": 2,
-              "first_name": "Foo",
-              "last_name": "Foo",
-              "picture": {
-                  "medium": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-ruby11-100px.png"
-              },
-              "custom_picture": false
-          },
-          "updated_at": "2022-06-25T08:05:28Z",
-          "updated_by": null,
-          "deleted_at": null,
-          "deleted_by": null,
-          "category": {
-              "id": 12,
-              "name": "Groceries"
-          },
-          "receipt": {
-              "large": null,
-              "original": null
-          },
-          "users": [
-              {
-                  "user": {
-                      "id": 2,
-                      "first_name": "Foo",
-                      "last_name": "Foo",
-                      "picture": {
-                          "medium": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-ruby11-100px.png"
-                      }
-                  },
-                  "user_id": 2,
-                  "paid_share": "83.25",
-                  "owed_share": "41.62",
-                  "net_balance": "41.63"
-              },
-              {
-                  "user": {
-                      "id": 1,
-                      "first_name": "Bar",
-                      "last_name": "Bar",
-                      "picture": {
-                          "medium": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-orange39-100px.png"
-                      }
-                  },
-                  "user_id": 1,
-                  "paid_share": "0.0",
-                  "owed_share": "41.63",
-                  "net_balance": "-41.63"
-              }
-          ]
+    {
+      "id": 1,
+      "group_id": 1,
+      "friendship_id": null,
+      "expense_bundle_id": null,
+      "description": "Groceries",
+      "repeats": false,
+      "repeat_interval": null,
+      "email_reminder": false,
+      "email_reminder_in_advance": -1,
+      "next_repeat": null,
+      "details": null,
+      "comments_count": 0,
+      "payment": false,
+      "creation_method": null,
+      "transaction_method": "offline",
+      "transaction_confirmed": false,
+      "transaction_id": null,
+      "transaction_status": null,
+      "cost": "83.25",
+      "currency_code": "AUD",
+      "repayments": [
+        {
+          "from": 1,
+          "to": 2,
+          "amount": "41.63"
+        }
+      ],
+      "date": "2022-06-25T08:05:17Z",
+      "created_at": "2022-06-25T08:05:28Z",
+      "created_by": {
+        "id": 2,
+        "first_name": "Foo",
+        "last_name": "Foo",
+        "picture": {
+          "medium": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-ruby11-100px.png"
+        },
+        "custom_picture": false
       },
-      {
-          "id": 2,
-          "group_id": 1,
-          "friendship_id": null,
-          "expense_bundle_id": null,
-          "description": "Payment",
-          "repeats": false,
-          "repeat_interval": null,
-          "email_reminder": false,
-          "email_reminder_in_advance": -1,
-          "next_repeat": null,
-          "details": "",
-          "comments_count": 1,
-          "payment": true,
-          "creation_method": "payment",
-          "transaction_method": "offline",
-          "transaction_confirmed": false,
-          "transaction_id": null,
-          "transaction_status": null,
-          "cost": "87.87",
-          "currency_code": "AUD",
-          "repayments": [
-              {
-                  "from": 2,
-                  "to": 1,
-                  "amount": "87.87"
-              }
-          ],
-          "date": "2022-06-25T05:04:34Z",
-          "created_at": "2022-06-25T05:04:31Z",
-          "created_by": {
-              "id": 1,
-              "first_name": "Bar",
-              "last_name": "Bar",
-              "picture": {
-                  "medium": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-orange39-100px.png"
-              },
-              "custom_picture": false
-          },
-          "updated_at": "2022-06-25T05:04:31Z",
-          "updated_by": null,
-          "deleted_at": null,
-          "deleted_by": null,
-          "category": {
-              "id": 18,
-              "name": "General"
-          },
-          "receipt": {
-              "large": null,
-              "original": null
-          },
-          "users": [
-              {
-                  "user": {
-                      "id": 2,
-                      "first_name": "Foo",
-                      "last_name": "Foo",
-                      "picture": {
-                          "medium": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-ruby11-100px.png"
-                      }
-                  },
-                  "user_id": 2,
-                  "paid_share": "0.0",
-                  "owed_share": "87.87",
-                  "net_balance": "-87.87"
-              },
-              {
-                  "user": {
-                      "id": 1,
-                      "first_name": "Bar",
-                      "last_name": "Bar",
-                      "picture": {
-                          "medium": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-orange39-100px.png"
-                      }
-                  },
-                  "user_id": 1,
-                  "paid_share": "87.87",
-                  "owed_share": "0.0",
-                  "net_balance": "87.87"
-              }
-          ]
+      "updated_at": "2022-06-25T08:05:28Z",
+      "updated_by": null,
+      "deleted_at": null,
+      "deleted_by": null,
+      "category": {
+        "id": 12,
+        "name": "Groceries"
       },
-      {
-          "id": 3,
-          "group_id": 1,
-          "friendship_id": null,
-          "expense_bundle_id": null,
-          "description": "Gas",
-          "repeats": false,
-          "repeat_interval": null,
-          "email_reminder": false,
-          "email_reminder_in_advance": -1,
-          "next_repeat": null,
-          "details": "",
-          "comments_count": 0,
-          "payment": false,
-          "creation_method": "split",
-          "transaction_method": "offline",
-          "transaction_confirmed": false,
-          "transaction_id": null,
-          "transaction_status": null,
-          "cost": "243.64",
-          "currency_code": "AUD",
-          "repayments": [
-              {
-                  "from": 2,
-                  "to": 1,
-                  "amount": "121.82"
-              }
-          ],
-          "date": "2022-06-24T00:19:49Z",
-          "created_at": "2022-06-24T00:19:47Z",
-          "created_by": {
-              "id": 1,
-              "first_name": "Bar",
-              "last_name": "Bar",
-              "picture": {
-                  "medium": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-orange39-100px.png"
-              },
-              "custom_picture": false
-          },
-          "updated_at": "2022-06-24T00:19:47Z",
-          "updated_by": null,
-          "deleted_at": null,
-          "deleted_by": null,
-          "category": {
-              "id": 18,
-              "name": "General"
-          },
-          "receipt": {
-              "large": null,
-              "original": null
-          },
-          "users": [
-              {
-                  "user": {
-                      "id": 2,
-                      "first_name": "Foo",
-                      "last_name": "Foo",
-                      "picture": {
-                          "medium": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-ruby11-100px.png"
-                      }
-                  },
-                  "user_id": 2,
-                  "paid_share": "0.0",
-                  "owed_share": "121.82",
-                  "net_balance": "-121.82"
-              },
-              {
-                  "user": {
-                      "id": 1,
-                      "first_name": "Bar",
-                      "last_name": "Bar",
-                      "picture": {
-                          "medium": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-orange39-100px.png"
-                      }
-                  },
-                  "user_id": 1,
-                  "paid_share": "243.64",
-                  "owed_share": "121.82",
-                  "net_balance": "121.82"
-              }
-          ]
+      "receipt": {
+        "large": null,
+        "original": null
       },
-      {
-          "id": 4,
-          "group_id": 1,
-          "friendship_id": null,
-          "expense_bundle_id": null,
-          "description": "Payment",
-          "repeats": false,
-          "repeat_interval": null,
-          "email_reminder": false,
-          "email_reminder_in_advance": -1,
-          "next_repeat": null,
-          "details": null,
-          "comments_count": 1,
-          "payment": true,
-          "creation_method": "payment",
-          "transaction_method": "offline",
-          "transaction_confirmed": false,
-          "transaction_id": null,
-          "transaction_status": null,
-          "cost": "81.69",
-          "currency_code": "AUD",
-          "repayments": [
-              {
-                  "from": 1,
-                  "to": 2,
-                  "amount": "81.69"
-              }
-          ],
-          "date": "2022-06-09T12:02:47Z",
-          "created_at": "2022-06-09T12:02:49Z",
-          "created_by": {
-              "id": 2,
-              "first_name": "Foo",
-              "last_name": "Foo",
-              "picture": {
-                  "medium": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-ruby11-100px.png"
-              },
-              "custom_picture": false
+      "users": [
+        {
+          "user": {
+            "id": 2,
+            "first_name": "Foo",
+            "last_name": "Foo",
+            "picture": {
+              "medium": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-ruby11-100px.png"
+            }
           },
-          "updated_at": "2022-06-09T12:02:49Z",
-          "updated_by": null,
-          "deleted_at": null,
-          "deleted_by": null,
-          "category": {
-              "id": 18,
-              "name": "General"
+          "user_id": 2,
+          "paid_share": "83.25",
+          "owed_share": "41.62",
+          "net_balance": "41.63"
+        },
+        {
+          "user": {
+            "id": 1,
+            "first_name": "Bar",
+            "last_name": "Bar",
+            "picture": {
+              "medium": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-orange39-100px.png"
+            }
           },
-          "receipt": {
-              "large": null,
-              "original": null
+          "user_id": 1,
+          "paid_share": "0.0",
+          "owed_share": "41.63",
+          "net_balance": "-41.63"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "group_id": 1,
+      "friendship_id": null,
+      "expense_bundle_id": null,
+      "description": "Payment",
+      "repeats": false,
+      "repeat_interval": null,
+      "email_reminder": false,
+      "email_reminder_in_advance": -1,
+      "next_repeat": null,
+      "details": "",
+      "comments_count": 1,
+      "payment": true,
+      "creation_method": "payment",
+      "transaction_method": "offline",
+      "transaction_confirmed": false,
+      "transaction_id": null,
+      "transaction_status": null,
+      "cost": "87.87",
+      "currency_code": "AUD",
+      "repayments": [
+        {
+          "from": 2,
+          "to": 1,
+          "amount": "87.87"
+        }
+      ],
+      "date": "2022-06-25T05:04:34Z",
+      "created_at": "2022-06-25T05:04:31Z",
+      "created_by": {
+        "id": 1,
+        "first_name": "Bar",
+        "last_name": "Bar",
+        "picture": {
+          "medium": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-orange39-100px.png"
+        },
+        "custom_picture": false
+      },
+      "updated_at": "2022-06-25T05:04:31Z",
+      "updated_by": null,
+      "deleted_at": null,
+      "deleted_by": null,
+      "category": {
+        "id": 18,
+        "name": "General"
+      },
+      "receipt": {
+        "large": null,
+        "original": null
+      },
+      "users": [
+        {
+          "user": {
+            "id": 2,
+            "first_name": "Foo",
+            "last_name": "Foo",
+            "picture": {
+              "medium": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-ruby11-100px.png"
+            }
           },
-          "users": [
-              {
-                  "user": {
-                      "id": 2,
-                      "first_name": "Foo",
-                      "last_name": "Foo",
-                      "picture": {
-                          "medium": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-ruby11-100px.png"
-                      }
-                  },
-                  "user_id": 2,
-                  "paid_share": "81.69",
-                  "owed_share": "0.0",
-                  "net_balance": "81.69"
-              },
-              {
-                  "user": {
-                      "id": 1,
-                      "first_name": "Bar",
-                      "last_name": "Bar",
-                      "picture": {
-                          "medium": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-orange39-100px.png"
-                      }
-                  },
-                  "user_id": 1,
-                  "paid_share": "0.0",
-                  "owed_share": "81.69",
-                  "net_balance": "-81.69"
-              }
-          ]
-      }
+          "user_id": 2,
+          "paid_share": "0.0",
+          "owed_share": "87.87",
+          "net_balance": "-87.87"
+        },
+        {
+          "user": {
+            "id": 1,
+            "first_name": "Bar",
+            "last_name": "Bar",
+            "picture": {
+              "medium": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-orange39-100px.png"
+            }
+          },
+          "user_id": 1,
+          "paid_share": "87.87",
+          "owed_share": "0.0",
+          "net_balance": "87.87"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "group_id": 1,
+      "friendship_id": null,
+      "expense_bundle_id": null,
+      "description": "Gas",
+      "repeats": false,
+      "repeat_interval": null,
+      "email_reminder": false,
+      "email_reminder_in_advance": -1,
+      "next_repeat": null,
+      "details": "",
+      "comments_count": 0,
+      "payment": false,
+      "creation_method": "split",
+      "transaction_method": "offline",
+      "transaction_confirmed": false,
+      "transaction_id": null,
+      "transaction_status": null,
+      "cost": "243.64",
+      "currency_code": "AUD",
+      "repayments": [
+        {
+          "from": 2,
+          "to": 1,
+          "amount": "121.82"
+        }
+      ],
+      "date": "2022-06-24T00:19:49Z",
+      "created_at": "2022-06-24T00:19:47Z",
+      "created_by": {
+        "id": 1,
+        "first_name": "Bar",
+        "last_name": "Bar",
+        "picture": {
+          "medium": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-orange39-100px.png"
+        },
+        "custom_picture": false
+      },
+      "updated_at": "2022-06-24T00:19:47Z",
+      "updated_by": null,
+      "deleted_at": null,
+      "deleted_by": null,
+      "category": {
+        "id": 18,
+        "name": "General"
+      },
+      "receipt": {
+        "large": null,
+        "original": null
+      },
+      "users": [
+        {
+          "user": {
+            "id": 2,
+            "first_name": "Foo",
+            "last_name": "Foo",
+            "picture": {
+              "medium": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-ruby11-100px.png"
+            }
+          },
+          "user_id": 2,
+          "paid_share": "0.0",
+          "owed_share": "121.82",
+          "net_balance": "-121.82"
+        },
+        {
+          "user": {
+            "id": 1,
+            "first_name": "Bar",
+            "last_name": "Bar",
+            "picture": {
+              "medium": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-orange39-100px.png"
+            }
+          },
+          "user_id": 1,
+          "paid_share": "243.64",
+          "owed_share": "121.82",
+          "net_balance": "121.82"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "group_id": 1,
+      "friendship_id": null,
+      "expense_bundle_id": null,
+      "description": "Payment",
+      "repeats": false,
+      "repeat_interval": null,
+      "email_reminder": false,
+      "email_reminder_in_advance": -1,
+      "next_repeat": null,
+      "details": null,
+      "comments_count": 1,
+      "payment": true,
+      "creation_method": "payment",
+      "transaction_method": "offline",
+      "transaction_confirmed": false,
+      "transaction_id": null,
+      "transaction_status": null,
+      "cost": "81.69",
+      "currency_code": "AUD",
+      "repayments": [
+        {
+          "from": 1,
+          "to": 2,
+          "amount": "81.69"
+        }
+      ],
+      "date": "2022-06-09T12:02:47Z",
+      "created_at": "2022-06-09T12:02:49Z",
+      "created_by": {
+        "id": 2,
+        "first_name": "Foo",
+        "last_name": "Foo",
+        "picture": {
+          "medium": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-ruby11-100px.png"
+        },
+        "custom_picture": false
+      },
+      "updated_at": "2022-06-09T12:02:49Z",
+      "updated_by": null,
+      "deleted_at": null,
+      "deleted_by": null,
+      "category": {
+        "id": 18,
+        "name": "General"
+      },
+      "receipt": {
+        "large": null,
+        "original": null
+      },
+      "users": [
+        {
+          "user": {
+            "id": 2,
+            "first_name": "Foo",
+            "last_name": "Foo",
+            "picture": {
+              "medium": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-ruby11-100px.png"
+            }
+          },
+          "user_id": 2,
+          "paid_share": "81.69",
+          "owed_share": "0.0",
+          "net_balance": "81.69"
+        },
+        {
+          "user": {
+            "id": 1,
+            "first_name": "Bar",
+            "last_name": "Bar",
+            "picture": {
+              "medium": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-orange39-100px.png"
+            }
+          },
+          "user_id": 1,
+          "paid_share": "0.0",
+          "owed_share": "81.69",
+          "net_balance": "-81.69"
+        }
+      ]
+    },
+    {
+      "id": 1951597584,
+      "group_id": 31946708,
+      "friendship_id": null,
+      "expense_bundle_id": null,
+      "description": "Coffee",
+      "repeats": false,
+      "repeat_interval": null,
+      "email_reminder": false,
+      "email_reminder_in_advance": -1,
+      "next_repeat": null,
+      "details": "",
+      "comments_count": 0,
+      "payment": false,
+      "creation_method": "split",
+      "transaction_method": "offline",
+      "transaction_confirmed": false,
+      "transaction_id": null,
+      "transaction_status": null,
+      "cost": "5.6",
+      "currency_code": "AUD",
+      "repayments": [
+        {
+          "from": 2,
+          "to": 1,
+          "amount": "5.6"
+        }
+      ],
+      "date": "2022-10-05T23:52:25Z",
+      "created_at": "2022-10-05T23:52:26Z",
+      "created_by": {
+        "id": 1,
+        "first_name": "Bar",
+        "last_name": "Bar",
+        "picture": {
+          "medium": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-orange39-100px.png"
+        },
+        "custom_picture": false
+      },
+      "updated_at": "2022-10-05T23:52:26Z",
+      "updated_by": null,
+      "deleted_at": null,
+      "deleted_by": null,
+      "category": {
+        "id": 18,
+        "name": "General"
+      },
+      "receipt": {
+        "large": null,
+        "original": null
+      },
+      "users": [
+        {
+          "user": {
+            "id": 2,
+            "first_name": "Foo",
+            "last_name": "Foo",
+            "picture": {
+              "medium": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-ruby11-100px.png"
+            }
+          },
+          "user_id": 2,
+          "paid_share": "0.0",
+          "owed_share": "5.6",
+          "net_balance": "-5.6"
+        },
+        {
+          "user": {
+            "id": 1,
+            "first_name": "Bar",
+            "last_name": "Bar",
+            "picture": {
+              "medium": "https://s3.amazonaws.com/splitwise/uploads/user/default_avatars/avatar-orange39-100px.png"
+            }
+          },
+          "user_id": 1,
+          "paid_share": "5.6",
+          "owed_share": "0.0",
+          "net_balance": "5.6"
+        }
+      ],
+      "comments": []
+    }
   ]
 }

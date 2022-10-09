@@ -5,6 +5,8 @@ use serde::{
     Deserialize, Deserializer, Serialize, Serializer,
 };
 
+use color_eyre::eyre::Result;
+
 #[derive(Debug, PartialEq, PartialOrd, Eq, Ord, Clone, Copy)]
 pub struct Cents(pub i64);
 
@@ -48,7 +50,10 @@ impl<'de> Deserialize<'de> for Cents {
                 let parts: Vec<&str> = value.split('.').collect();
 
                 let dollars = parts[0].parse::<i64>().map_err(E::custom)?;
-                let cents = parts[1].parse::<i64>().map_err(E::custom)?;
+
+                // Splitwise will truncate the ones position leading to an incorrect parsing
+                // e.g. 5.6 instead of 5.60 leads to 500 + 6 instead of 500 + 60
+                let cents = format!("{:0<2}", parts[1]).parse::<i64>().map_err(E::custom)?;
 
                 Ok(Cents(dollars * 100 + dollars.signum() * cents))
             }
@@ -63,7 +68,7 @@ impl Serialize for Cents {
         let dollars = self.0 / 100;
         let cents = self.0.abs() % 100;
 
-        let result = format!("{}.{}", dollars, cents);
+        let result = format!("{}.{:0>2}", dollars, cents);
 
         serializer.serialize_str(&result)
     }
@@ -72,6 +77,8 @@ impl Serialize for Cents {
 #[cfg(test)]
 mod cents_test {
     use quickcheck_macros::quickcheck;
+    use color_eyre::eyre::Result;
+
 
     use super::Cents;
 
@@ -85,5 +92,14 @@ mod cents_test {
             .unwrap();
 
         val1 == val2
+    }
+
+    #[test]
+    fn test_rounding() -> Result<()> {
+        let value = serde_json::from_str::<Cents>("\"5.6\"")?;
+
+        assert_eq!(Cents(560), value);
+
+        Ok(())
     }
 }
